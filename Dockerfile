@@ -23,6 +23,18 @@ RUN apk update && apk add --no-cache \
     && pip install 'cryptography>=2.2' pyasyncore prompt_toolkit 'pyjwt>=2.4' \
     --no-warn-script-location --disable-pip-version-check
 
+# Copy config example and script for setting secrets
+COPY emailproxy.config.example /emailproxy/emailproxy.config
+COPY set_emailproxy_secrets.sh /tmp/set_emailproxy_secrets.sh
+
+# Set build arguments for client_id and client_secret
+ARG EMAILPROXY_CLIENT_ID
+ARG EMAILPROXY_CLIENT_SECRET
+
+# Replace client_id and client_secret in config, then remove script
+RUN /tmp/set_emailproxy_secrets.sh /emailproxy/emailproxy.config "$EMAILPROXY_CLIENT_ID" "$EMAILPROXY_CLIENT_SECRET" \
+    && rm /tmp/set_emailproxy_secrets.sh
+
 # Set TERM environment variable for tmux
 ENV TERM=xterm-256color
 
