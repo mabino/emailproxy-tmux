@@ -27,12 +27,17 @@ RUN apk update && apk add --no-cache \
 COPY emailproxy.config.example /emailproxy/emailproxy.config
 COPY set_emailproxy_secrets.sh /tmp/set_emailproxy_secrets.sh
 
-# Set build arguments for client_id and client_secret
+# Set build arguments for client_id, client_secret, account, redirect_uri, and redirect_listen_address
 ARG EMAILPROXY_CLIENT_ID
 ARG EMAILPROXY_CLIENT_SECRET
+ARG EMAILPROXY_ACCOUNT
+ARG EMAILPROXY_REDIRECT_URI
+ARG EMAILPROXY_REDIRECT_LISTEN_ADDRESS
 
-# Replace client_id and client_secret in config, then remove script
-RUN /tmp/set_emailproxy_secrets.sh /emailproxy/emailproxy.config "$EMAILPROXY_CLIENT_ID" "$EMAILPROXY_CLIENT_SECRET" \
+# Replace config values, then remove script
+RUN /tmp/set_emailproxy_secrets.sh /emailproxy/emailproxy.config \
+    "$EMAILPROXY_ACCOUNT" "$EMAILPROXY_CLIENT_ID" "$EMAILPROXY_CLIENT_SECRET" \
+    "$EMAILPROXY_REDIRECT_URI" "$EMAILPROXY_REDIRECT_LISTEN_ADDRESS" \
     && rm /tmp/set_emailproxy_secrets.sh
 
 # Set TERM environment variable for tmux
